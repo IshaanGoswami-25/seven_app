@@ -1,37 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'splash_screen.dart'; // 👈 This links your main entry point to your gateway screen
+import 'splash_screen.dart';
+import 'profile_view_screen.dart';
 
 void main() async {
-  // Ensure the native Flutter platform frameworks are fully booted
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Connect directly to your cloud backend
   await Supabase.initialize(
+    // 📄 PASTE YOUR ACTUAL SUPABASE URL HERE (e.g., https://xyz.supabase.co)
     url: 'https://rwjufykmmnawfgorxrvt.supabase.co',
-    anonKey:
+
+    // 🔑 PASTE YOUR ACTUAL ANON KEY HERE (The super long string)
+    publishableKey:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3anVmeWttbW5hd2Znb3J4cnZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5OTczMDcsImV4cCI6MjA5NjU3MzMwN30.F4Tcl1_bJbcjIIDHhP0ohZf_kzJ6K8khdKANkffbs0Q',
   );
 
-  runApp(const MyApp());
+  runApp(const SevenApp());
 }
 
-// Global handle to query database tables anywhere inside your app screens
 final supabase = Supabase.instance.client;
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class SevenApp extends StatelessWidget {
+  const SevenApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '7even Core',
+      title: '7even',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: const Color(0xFF0B0B0F), // Premium dark theme
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF050507),
       ),
-      // 👈 CHANGE THIS LINE: Set the landing page to the SplashScreen
-      home: const SplashScreen(),
+      onGenerateRoute: (settings) {
+        final uri = Uri.parse(settings.name ?? '/');
+
+        if (uri.pathSegments.length == 2 && uri.pathSegments.first == 'p') {
+          final username = uri.pathSegments.last;
+          return MaterialPageRoute(
+            builder: (_) => ProfileViewScreen(username: username),
+          );
+        }
+
+        return MaterialPageRoute(builder: (_) => const SplashScreen());
+      },
     );
   }
 }
